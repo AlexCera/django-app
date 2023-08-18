@@ -1,0 +1,69 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container mt-3 d-flex justify-content-center">
+  <div class="w-100">
+    <canvas id="chart_companies"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    $(document).ready(async () => {
+      const result = await fetch('http://localhost:8000/companies/data', {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const companies = await result.json();
+
+      let labelCompanies = [];
+      let ratingCompanies = [];
+      companies.forEach(element => {
+        labelCompanies.push(element.fields.name)
+        ratingCompanies.push(element.fields.risk_rating)
+      });
+
+      const ctx = document.getElementById('chart_companies');
+      const data = {
+        labels: labelCompanies,
+        datasets: [{
+          label: 'EMPRESAS (ponderación de riesgos en porcentaje)',
+          data: ratingCompanies,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+          ],
+          borderWidth: 1,
+          borderRadius: 5,
+          borderSkipped: false,
+        }]
+      };
+      new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+    });
+  </script>
+
+</div>
+
+{% endblock %}
